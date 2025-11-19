@@ -8,7 +8,9 @@ const lastPong = new Map(); // Track last pong time per port
 const PING_INTERVAL = 5000; // Send ping every 5 seconds
 const PONG_TIMEOUT = 10000; // Consider port closed if no pong in 10 seconds
 
-// Function to ping all ports and check for timeouts
+// pingPorts sends heartbeat pings to all connected page ports and
+// removes ports that fail to respond within `PONG_TIMEOUT`. When no
+// ports remain it also closes the websocket to free resources.
 function pingPorts() {
     const now = Date.now();
     ports.forEach((port) => {

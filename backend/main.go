@@ -1,5 +1,8 @@
 package main
 
+// main initializes the database, applies migrations, configures routes
+// and starts the HTTP server on port :8080.
+
 import (
 	"fmt"
 	"log"

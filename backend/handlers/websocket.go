@@ -57,11 +57,16 @@ func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// WebSocketHandler upgrades an HTTP connection to a websocket, registers
+// the user connection, and listens for incoming messages to handle.
+
 func ErrorMessage(senderID int, conn *websocket.Conn) {
 	conn.WriteJSON(models.WSMessage{
 		Type: "error",
 	})
 }
+
+// ErrorMessage sends a simple error WSMessage to the given connection.
 
 func handleMessage(msg models.WSMessage, conn *websocket.Conn) {
 	var err error
@@ -100,6 +105,9 @@ func handleMessage(msg models.WSMessage, conn *websocket.Conn) {
 	}
 }
 
+// handleMessage processes incoming websocket messages based on type
+// (new_message, read, users, typing) and routes or stores messages.
+
 func distributeMessage(msg models.WSMessage) {
 	var err error
 	clientsMu.RLock()
@@ -119,6 +127,9 @@ func distributeMessage(msg models.WSMessage) {
 		}
 	}
 }
+
+// distributeMessage sends the provided message to the sender and receiver
+// clients when connected, attaching member lists and client IDs.
 
 func broadcastUserStatus() {
 	var err error
@@ -142,6 +153,9 @@ func broadcastUserStatus() {
 	}
 }
 
+// broadcastUserStatus iterates connected clients and broadcasts presence
+// updates including member lists and online client IDs.
+
 func removeClient(userID int) {
 	clientsMu.Lock()
 	if conn, ok := clients[userID]; ok {
@@ -153,6 +167,9 @@ func removeClient(userID int) {
 	broadcastUserStatus()
 }
 
+// removeClient closes and removes a client connection and broadcasts
+// the updated user presence to remaining clients.
+
 func getClientIDs() []int {
 	keys := make([]int, 0, len(clients))
 	for key := range clients {
@@ -160,3 +177,5 @@ func getClientIDs() []int {
 	}
 	return keys
 }
+
+// getClientIDs returns a slice of connected client user IDs.

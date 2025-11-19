@@ -13,6 +13,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 )
 
+// RegisterHandler accepts a JSON payload to register a new user. It validates
+// the input, creates the user and responds with appropriate HTTP status codes.
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 
@@ -41,6 +43,11 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	// Handle response
 }
 
+// RegisterHandler accepts a JSON payload to register a new user. It validates
+// the input, creates the user and responds with appropriate HTTP status codes.
+
+// LoginHandler authenticates a user and sets a session cookie (uuid) on success.
+// It validates credentials, updates the user's UUID and expiry, and returns user info.
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	err := utils.ParseBody(r, &user)
@@ -87,6 +94,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Handle response
 }
 
+// LoginHandler authenticates a user and sets a session cookie (uuid) on success.
+// It validates credentials, updates the user's UUID and expiry, and returns user info.
+
+// LogoutHandler invalidates the current user's session and clears the session cookie.
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {
@@ -105,6 +116,8 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	utils.RespondWithJSON(w, http.StatusNoContent)
 }
+
+// LogoutHandler invalidates the current user's session and clears the session cookie.
 
 // handlers/auth.go
 func CheckAuthHandler(w http.ResponseWriter, r *http.Request) {

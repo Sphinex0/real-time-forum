@@ -16,6 +16,8 @@ const patterns = {
     gender: /^(male|female)$/,
 };
 
+// renderTemplate injects the auth HTML into the `#authContainer` element
+// and toggles its display. Pass an empty string to hide the container.
 const renderTemplate = (html) => {
     const container = document.getElementById("authContainer")
     container.innerHTML = html;
@@ -26,6 +28,8 @@ const renderTemplate = (html) => {
     }
 }
 
+// renderAuthForms builds and shows the signup/login form UI and wires
+// up the submit buttons to `handleLogin` and `handleSignup`.
 export const renderAuthForms = () => {
     renderTemplate(/*html */`
         <div class="log">
@@ -127,6 +131,9 @@ export const renderAuthForms = () => {
 
 }
 
+// validateInput validates an element's trimmed value against the provided
+// regex `pattern`. On failure it adds an `.Error` class and returns false,
+// otherwise returns the trimmed value.
 const validateInput = (id, pattern) => {
     const input = document.getElementById(id)
     const value = input.value.trim();
@@ -138,6 +145,8 @@ const validateInput = (id, pattern) => {
     return value;
 }
 
+// handleLogin authenticates the user by calling `/login` and wiring up
+// post-login UI behavior on success.
 const handleLogin = async () => {
     const email = validateInput("login-email", patterns.nickname) ||
         validateInput("login-email", patterns.email);
@@ -165,6 +174,7 @@ const handleLogin = async () => {
         socket.open()
     }
 }
+// domLogout performs local cleanup for logout (UI and localStorage).
 export const domLogout = ()=>{
   userInfo = undefined
   Utils.notice("goodbye")
@@ -175,6 +185,7 @@ export const domLogout = ()=>{
   socket.close()
   isLoggedin = false
 }
+// handleLogout calls the `/logout` endpoint and, on success, runs domLogout.
 export const handleLogout = async () => {
     const response = await fetch('/logout');
     if (response.status === 204) {
@@ -185,6 +196,7 @@ export const handleLogout = async () => {
 }
 
 
+// handleSignup validates the signup form and submits registration to `/register`.
 const handleSignup = async (e) => {
     const nickname = validateInput("nickname", patterns.nickname, "*Invalid nickname");
     const ageInput = document.getElementById("age");
@@ -215,6 +227,8 @@ const handleSignup = async (e) => {
 }
 
 
+// checkUserLogin calls `/check-auth` to determine if a session is active
+// and populates `userInfo` if successful.
 export const checkUserLogin = async () => {
     const response = await fetch('/check-auth');
     const data = await response.json()

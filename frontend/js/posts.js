@@ -2,7 +2,8 @@ import { addComment, getComments, renderComment } from "./comments.js";
 import { main } from "./components.js";
 import Utils from "./utils.js";
 
-// js/posts.js
+// renderPost returns the HTML string for a single post object.
+// It sanitizes fields and includes user, content, categories and image.
 const renderPost = (post) => {
     return /*html*/`
             <div class="post" id="${post.id}" data-before="${post.created_at}">
@@ -48,6 +49,9 @@ const renderPost = (post) => {
         `;
 }
 
+// addPost handles the post creation form submit, validates inputs and
+// sends a FormData POST request to `/posts/store`. On success it inserts
+// the new post into the DOM and wires up its events.
 export const addPost = async (e) => {
     e.preventDefault();
 
@@ -107,6 +111,8 @@ export const addPost = async (e) => {
     }
 }
 
+// getposts fetches and renders posts created before the optional `before`
+// unix timestamp (in seconds). It appends posts to the DOM and attaches events.
 export const getposts = async (before = +(new Date().getTime() / 1000).toFixed(0)) => {
     const response = await fetch('/posts', {
         method: 'POST',
@@ -127,6 +133,9 @@ export const getposts = async (before = +(new Date().getTime() / 1000).toFixed(0
     }
 }
 
+// addCommentsElement loads comments for a given post id and inserts them
+// into the provided `commentSection`. When `prepend` is true comments are
+// added to the top (used for new comments).
 export const addCommentsElement = async (id, commentSection, prepend = false) => {
     const before = +commentSection.querySelector(".comment:last-child")?.dataset.before || +(new Date().getTime() / 1000).toFixed(0)
     const comments = await getComments(id, before) || []
@@ -134,6 +143,8 @@ export const addCommentsElement = async (id, commentSection, prepend = false) =>
 }
 
 
+// addPostEvents attaches click and submit handlers for a rendered post
+// element (likes, dislikes, comment toggles and add-comment form).
 const addPostEvents = (post, postElm) => {
     postElm.querySelector(`.like`).addEventListener("click", (e) => { Utils.like(+postElm.id, 1, "post_id", e.target.parentElement) })
     postElm.querySelector(`.dislike`).addEventListener("click", (e) => { Utils.like(+postElm.id, -1, "post_id", e.target.parentElement) })

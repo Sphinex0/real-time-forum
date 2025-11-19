@@ -7,6 +7,8 @@ import (
 	"reflect"
 )
 
+// RespondWithJSON writes a JSON response with the given HTTP status code.
+// An optional payload can be provided (first vararg element is encoded as JSON).
 func RespondWithJSON(w http.ResponseWriter, status int, payload ...interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -18,6 +20,9 @@ func RespondWithJSON(w http.ResponseWriter, status int, payload ...interface{}) 
 	}
 }
 
+// RespondWithError sends a standardized JSON error response using
+// `RespondWithJSON`. If a custom message is provided it is used,
+// otherwise a generic message is returned.
 func RespondWithError(w http.ResponseWriter, code int, msg ...string) {
 	if len(msg) > 0 {
 		RespondWithJSON(w, code, map[string]any{"message": msg[0]})
@@ -26,13 +31,15 @@ func RespondWithError(w http.ResponseWriter, code int, msg ...string) {
 	}
 }
 
+// ParseBody decodes a JSON request body into the provided destination `v`.
+// It closes the request body before returning. Returns an error when decoding fails.
 func ParseBody(r *http.Request, v interface{}) error {
 	defer r.Body.Close()
 	return json.NewDecoder(r.Body).Decode(v)
 }
 
 // GetScanFields returns a slice of pointers to struct fields for scanning SQL results.
-// Pass a pointer to the struct. 
+// Pass a pointer to the struct.
 // Example: GetScanFields(&user) => []*interface{}{&user.ID, &user.FirstName, &user.LastName, &user.Nickname, &user.Image}
 func GetScanFields(s interface{}) []interface{} {
 	val := reflect.ValueOf(s)

@@ -6,8 +6,12 @@ let aContainer
 let bContainer 
 let allButtons 
 
+// getButtons prevents default behavior for form submit buttons used
+// in the auth UI to avoid full page reloads.
 let getButtons = (e) => e.preventDefault();
 
+// changeForm toggles the signup/login animated panels.
+// Wired to switch buttons to animate between forms.
 export const changeForm = (e) => {
     switchCtn.classList.add("is-gx");
     setTimeout(function () {
@@ -23,6 +27,7 @@ export const changeForm = (e) => {
     bContainer.classList.toggle("is-z200");
 };
 
+// mainF initializes the auth form animation UI and wires event listeners.
 export let mainF = () => {
     switchCtn = document.querySelector("#switch-cnt");
     switchC1 = document.querySelector("#switch-c1");

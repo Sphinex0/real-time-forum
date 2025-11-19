@@ -1,5 +1,7 @@
 import Utils from "./utils.js"
 
+// renderComment returns a DOM element for a single comment object.
+// It wires up like/dislike button handlers for this comment.
 export const renderComment = (comment) => {
     const commentDiv = document.createElement("div")
     commentDiv.className="comment"
@@ -34,6 +36,8 @@ export const renderComment = (comment) => {
 }
 
 
+// getComments requests a page of comments for a post created before
+// the provided timestamp (`before`). Returns an array of comments.
 export const getComments = async (post_id, before) => {
     const response = await fetch('/comments', {
         method: 'POST',
@@ -48,6 +52,9 @@ export const getComments = async (post_id, before) => {
 }
 
 
+// addComment handles the add-comment form submit, validates length and
+// posts the comment to `/comments/store`. On success it prepends the
+// created comment to the comment list in the UI.
 export const addComment = async (e) => {
     e.preventDefault()
     const input = e.target.querySelector(".comment-input")

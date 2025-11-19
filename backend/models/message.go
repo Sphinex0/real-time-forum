@@ -26,6 +26,9 @@ type WSMessage struct {
 	Typing  bool      `json:"is_typing"`
 }
 
+// GetMessageHistory retrieves a paginated list of messages between sender
+// and receiver that were created before the provided `time` (unix seconds).
+// It returns at most 10 messages ordered by creation time descending.
 func GetMessageHistory(sender, receiver, time int) (messages []Message, err error) {
 	rows, err := db.DB.Query(`
 	    SELECT * FROM messages
@@ -51,12 +54,15 @@ func GetMessageHistory(sender, receiver, time int) (messages []Message, err erro
 	return
 }
 
+// StoreMessage inserts the message into the database, using all fields
+// except `ID`. Returns any execution error.
 func (message *Message) StoreMessage() error {
 	// message.CreatedAt = int(time.Now().Unix())
 	_, err := db.DB.Exec("INSERT INTO messages VALUES(NULL ,?,?,?,?,?)", utils.GetExecFields(message, "ID")...)
 	return err
 }
 
+// UpdateRead marks messages between the message's sender and receiver as read.
 func (message *Message) UpdateRead() error {
 	_, err := db.DB.Exec("UPDATE messages SET is_read = true WHERE sender_id = ? AND receiver_id = ? AND is_read = false", message.ReceiverID, message.SenderID)
 	return err

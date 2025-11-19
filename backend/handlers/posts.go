@@ -12,6 +12,8 @@ import (
 	"forum/utils/middlewares"
 )
 
+// CreatePostHandler validates and stores a new post. It processes optional
+// uploaded images, enforces category validation and returns the created post.
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post models.Post
 
@@ -57,6 +59,8 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, post_user)
 }
 
+// GetPostsHandler returns a paginated list of posts with their user info and likes.
+// It expects an optional `before` timestamp in the request body.
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var before struct {
 		Before int `json:"before"`
@@ -107,10 +111,13 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, posts)
 }
 
+// getValidCategories returns the allowed post categories.
 func getValidCategories() []string {
 	return []string{"tech", "programming", "health", "finance", "food", "science", "memes", "others"}
 }
 
+// isValidCategory filters the provided categories and returns a cleaned list
+// that contains only allowed categories; defaults to `others` when none match.
 func isValidCategory(categories []string) (newCats []string) {
 	validCategories := getValidCategories()
 	for _, validCat := range validCategories {

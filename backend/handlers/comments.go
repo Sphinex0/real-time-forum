@@ -12,6 +12,9 @@ import (
 	"forum/utils/middlewares"
 )
 
+// CreateCommentHandler handles creating a new comment for a post.
+// It validates the request body, ensures the user is authenticated and
+// stores the comment, returning the created comment with user info.
 func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	var comment models.CommentWithUser
 
@@ -58,6 +61,8 @@ func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, comment)
 }
 
+// GetCommentsHandler retrieves a paginated list of comments for a post.
+// It expects a JSON payload containing `post_id` and `before` timestamp.
 func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		Post_id int `json:"post_id"`

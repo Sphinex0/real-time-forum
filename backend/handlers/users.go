@@ -12,6 +12,8 @@ import (
 	"forum/utils/middlewares"
 )
 
+// GetMessageHistoryHandler retrieves message history between the authenticated
+// user and another receiver. Expects `receiver_id` and `before` timestamp.
 func GetMessageHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {
@@ -41,6 +43,9 @@ func GetMessageHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, messages)
 }
 
+// GetUsers returns a list of members along with last message time and
+// unread counts relative to the provided userID. This is used to build
+// presence and conversations lists for websocket clients.
 func GetUsers(userID int) (users []models.Members, err error) {
 	query := `
         SELECT 

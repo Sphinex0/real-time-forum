@@ -12,6 +12,8 @@ import (
 	"forum/utils/middlewares"
 )
 
+// CreateLikesHandler creates, updates or removes a like/dislike for a post or comment.
+// It validates input, enforces authentication and returns the aggregated likes summary.
 func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 	var like models.Likes
 
@@ -93,6 +95,8 @@ func CreateLikesHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusCreated, likes)
 }
 
+// GetLikesHandler returns the like/dislike counts and the current user's like
+// for the provided post or comment ID.
 func GetLikesHandler(w http.ResponseWriter, r *http.Request) {
 	var likes models.GetLikes
 	err := utils.ParseBody(r, &likes)
@@ -107,6 +111,8 @@ func GetLikesHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, likes)
 }
 
+// GetLikes computes aggregate like/dislike counts and the requesting user's
+// current like (if any) for the given content ID. It requires authentication.
 func GetLikes(w http.ResponseWriter, r *http.Request, likes models.GetLikes) (models.GetLikes, error) {
 	user, ok := r.Context().Value(middlewares.UserIDKey).(models.User)
 	if !ok {

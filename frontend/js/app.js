@@ -6,11 +6,14 @@ import Utils from "./utils.js";
 import WebWorkerClient from "./websocket.js";
 
 
+// `container` is the app root element. `socket` is the shared-worker websocket
 export const container = document.querySelector(".container")
 export const socket = new WebWorkerClient()
 
 
-// Wait for the DOM to load
+// Initialize application once the DOM is ready. This sets up a global
+// fetch wrapper for common error handling, routes the user to auth or app
+// UI depending on session, and opens the shared websocket when logged in.
 document.addEventListener("DOMContentLoaded", async () => {
 
 
