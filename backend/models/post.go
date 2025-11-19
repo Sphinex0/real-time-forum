@@ -32,6 +32,9 @@ func length(a, b int, e string) bool {
 	return len(e) < a || len(e) > b
 }
 
+// BeforCreatePost validates and trims incoming post fields from the request.
+// It reads title and content from the form values and enforces length limits.
+// Returns an error when validation fails.
 func (post *Post) BeforCreatePost(r *http.Request) error {
 	post.Content = strings.TrimSpace(r.FormValue("content"))
 	post.Title = strings.TrimSpace(r.FormValue("title"))
@@ -44,7 +47,9 @@ func (post *Post) BeforCreatePost(r *http.Request) error {
 
 const maxFileSize = 1000000 // 1MB file size limit
 
-// Helper function to handle image uploads
+// HandleImage processes an uploaded file and saves it under the frontend
+// assets directory. It validates the file size and extension and returns
+// the generated filename on success or an empty string on failure.
 func HandleImage(path string, file multipart.File, fileheader *multipart.FileHeader) string {
 	if fileheader.Size > maxFileSize {
 		return ""

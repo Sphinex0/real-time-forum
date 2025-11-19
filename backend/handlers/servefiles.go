@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+// ServeFilesHandler serves static frontend files. If the requested path
+// does not exist it falls back to serving `index.html` (SPA behavior).
 func ServeFilesHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := os.ReadFile("../frontend" + r.URL.Path)
 	if err != nil {

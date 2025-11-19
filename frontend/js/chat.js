@@ -2,6 +2,11 @@ import { socket } from "./app.js";
 import { userInfo } from "./auth.js";
 import Utils from "./utils.js";
 
+/**
+ * ChatManager handles chat UI behavior for a single conversation.
+ * It wires input events, typing indicators, message sending and loading.
+ * @param {Object} receiverUser - The user object representing the chat peer.
+ */
 export class ChatManager {
     constructor(receiverUser) {
         this.isTyping = true
@@ -13,6 +18,8 @@ export class ChatManager {
         this.timer
     }
 
+    // setupEventListeners attaches keyboard, blur and scroll handlers for
+    // typing indicators and lazy-loading older messages.
     setupEventListeners() {
         this.messageInput.addEventListener('keypress', e => {
             if (e.shiftKey && e.key === 'Enter') {
@@ -88,6 +95,8 @@ export class ChatManager {
         }, 250));
     }
 
+    // loadMessages fetches paginated messages before the oldest currently
+    // displayed message and prepends them to the chat view.
     async loadMessages() {
         const oldestMessage = this.chatMessages.firstElementChild;
         const before = +oldestMessage?.dataset.timestamp || new Date().getTime();
@@ -108,6 +117,10 @@ export class ChatManager {
         this.chatMessages.scrollTop = this.chatMessages.scrollHeight - oldHeight;
     }
 
+    // addMessage renders a single message object into the chat view.
+    // - msg: message payload from the server
+    // - prepend: whether to add at the top
+    // - scrollTo: if true, smoothly scrolls the new message into view
     addMessage(msg, prepend = false, scrollTo) {
         const user = msg.sender_id === this.receiverUser.id ? this.receiverUser : userInfo;
         const element = document.createElement('div');

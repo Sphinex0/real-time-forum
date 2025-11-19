@@ -18,6 +18,8 @@ type CommentWithUser struct {
 	User Members `json:"user"`
 }
 
+// BeforCreateComment validates a comment's content length and ensures
+// it is associated with a post. Returns an error if validation fails.
 func (comment *Comment) BeforCreateComment() error {
 	if length(1, 2000, comment.Content) || comment.PostID == 0 {
 		return errors.New("size not allowed")

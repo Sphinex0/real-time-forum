@@ -5,6 +5,8 @@ import { getposts } from "./posts.js"
 import Utils from "./utils.js"
 export let main
 
+// renderHome builds the main application layout (nav, home, chat, profile)
+// and attaches scroll handlers for infinite-post loading.
 export const renderHome = () => {
     container.innerHTML = /*html */`
     <div class="empty-aside1"></div>
@@ -137,6 +139,8 @@ export const renderHome = () => {
 
 export let ChatUI
 
+// renderUsers populates the users sidebar and wires click handlers to
+// open chat sessions and mark messages as read.
 export const renderUsers = (users) => {
     const usersAside = document.querySelector(".users")
     usersAside.innerHTML = /*html*/ `

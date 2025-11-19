@@ -1,5 +1,7 @@
 class Utils {
-    static(func, wait) {
+    // debounce(func, wait): returns a debounced version of `func` that
+    // delays invocation until `wait` ms have elapsed since the last call.
+    static debounce(func, wait) {
         let timeout;
         return function (...args) {
             clearTimeout(timeout);
@@ -7,6 +9,8 @@ class Utils {
         };
     }
 
+    // throttle(func, limit): ensures `func` is invoked at most once every
+    // `limit` milliseconds.
     static throttle(func, limit) {
         let inThrottle;
         return (...args) => {
@@ -18,6 +22,9 @@ class Utils {
         };
     }
 
+    // opThrottle is an order-preserving throttle: it guarantees `func` is
+    // called immediately on first invocation and then at most once per
+    // `limit` ms, preserving the last call.
     static opThrottle(func, limit) {
         let lastFunc;
         let lastRan;
@@ -37,15 +44,15 @@ class Utils {
         };
     }
 
-
-
-
+    // sanitizeHTML escapes any HTML in the provided string and returns
+    // a safe HTML-encoded string for insertion into the DOM.
     static sanitizeHTML(dirtyHTML) {
         const tempDiv = document.createElement('div');
         tempDiv.textContent = dirtyHTML; // Escapes HTML
         return tempDiv.innerHTML;
     }
 
+    // notice shows a transient notification message in the page.
     static notice(message) {
         const alertMsg = document.createElement("div")
         alertMsg.textContent = message
@@ -56,6 +63,8 @@ class Utils {
         }, 5000)
     }
 
+    // like sends a like/dislike request for a post/comment and updates the
+    // provided post footer DOM elements with the returned counts and state.
     static async like(id, likeOrDislike, commentOrPost, ...postFooters) {
         const response = await fetch('/likes/store', {
             method: 'POST',

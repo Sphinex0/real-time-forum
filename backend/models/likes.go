@@ -23,6 +23,8 @@ type GetLikes struct {
 	C_ID     *int64 `json:"c_id"`
 }
 
+// BeforCreateLikes validates the like payload (ensuring proper NameID and Like value)
+// and sets the derived LikeType. Returns an error for invalid inputs.
 func (like *Likes) BeforCreateLikes() error {
 	if like.NameID != "comment_id" && like.NameID != "post_id" {
 		return errors.New("invalid NameID")

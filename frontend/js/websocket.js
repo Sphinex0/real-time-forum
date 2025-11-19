@@ -2,9 +2,15 @@ import { userInfo } from "./auth.js";
 import { ChatUI, renderUsers } from "./components.js";
 import Utils from "./utils.js";
 
+/**
+ * WebWorkerClient manages the SharedWorker-based websocket bridge.
+ * It posts messages to the shared worker and handles incoming events
+ * to update the UI (users, typing, new messages, read receipts).
+ */
 class WebWorkerClient {
     constructor() {
     }
+    // open starts the SharedWorker connection and initializes state
     open = () => {
         this.worker = new SharedWorker("/js/worker.js")
         this.worker.port.start()
@@ -14,12 +20,14 @@ class WebWorkerClient {
         this.timer
     }
 
+    // setupEventListeners attaches the worker port message listener.
     setupEventListeners = () => {
 
         this.worker.port.onmessage = this.handleMessage;
 
     }
 
+    // PreRenderUsers applies online/offline status and renders user list.
     PreRenderUsers = ({ members, data }) => {
         members = members.map((member) => {
             member.status = data.includes(member.id) ? 'online' : 'offline';
@@ -28,6 +36,8 @@ class WebWorkerClient {
         renderUsers(members);
     }
 
+    // handleMessage processes messages received from the worker and
+    // updates the chat UI accordingly.
     handleMessage = ({ data }) => {
         switch (data.type) {
             case 'users':
@@ -78,19 +88,23 @@ class WebWorkerClient {
         }
     }
 
+    // markRead sends a read receipt for the given receiver ID.
     markRead = (receiver_id) => {
         this.sendMessage({ type: 'read', message: { receiver_id } });
         this.worker.port.postMessage({ type: 'read', payload: { type: 'read', message: { receiver_id } } })
     }
 
+    // sendMessage forwards a WS-like message payload to the shared worker.
     sendMessage = (message) => {
         this.worker.port.postMessage({ type: "send", payload: message });
     }
 
+    // getUsers requests the current users/presence list from the worker.
     getUsers = () => {
         this.sendMessage({ type: 'users' });
     }
 
+    // close signals the worker to close the shared websocket connection.
     close = () => {
         this.worker?.port.postMessage({ type: "close" })
     }

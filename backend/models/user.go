@@ -30,6 +30,9 @@ type User struct {
 	Image     string `json:"image"`
 }
 
+// BeforeCreate prepares and validates the user fields prior to insertion.
+// It trims/normalizes inputs, validates patterns, hashes the password and
+// initializes default fields like CreatedAt and Image.
 func (u *User) BeforeCreate() error {
 	u.CreatedAt = time.Now().Unix()
 
@@ -67,29 +70,38 @@ func (u *User) BeforeCreate() error {
 	return nil
 }
 
+// VerifyPassword checks that the provided raw password matches the stored
+// hashed password and that the stored hash satisfies the expected pattern.
 func (u *User) VerifyPassword(password string) bool {
 	passPattern := regexp.MustCompile(`^.{8,100}$`)
 	return passPattern.MatchString(u.Password) && bcrypt.CompareHashAndPassword([]byte(password), []byte(u.Password)) == nil
 }
 
+// CreateUser inserts the user into the database. Fields like ID and UUID are
+// omitted from the insert via GetExecFields.
 func (user *User) CreateUser() error {
 	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	_, err := db.DB.Exec(`INSERT INTO users VALUES (NULL,NULL,0,?,?,?,?,?,?,?,?,0,?)`, utils.GetExecFields(user, "ID", "UUID", "UUID_EXP", "LastSeen")...)
 	return err
 }
 
+// UpdateUuid updates the stored session UUID and expiration for the user.
 func (user *User) UpdateUuid() error {
 	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	_, err := db.DB.Exec(`UPDATE users SET uuid = ? , uuid_exp = ? WHERE id = ?`, user.UUID, user.UUID_EXP, user.ID)
 	return err
 }
 
+// Logout clears the user's UUID and expiry in the database, effectively
+// invalidating any active sessions for that user ID.
 func Logout(id int) error {
 	_, err := db.DB.Exec(`UPDATE users SET uuid = NULL , uuid_exp = 0 WHERE id = ?`, id)
 	return err
 }
 
 // SQL Injection Prevention
+// GetUserBy looks up a user by email or nickname after validation to protect
+// against injection. Returns the user record or an error.
 func GetUserBy(id string) (*User, error) {
 	id = strings.TrimSpace(strings.ToLower(id))
 	nicknamePattern := regexp.MustCompile(`^[a-zA-Z0-9_-]{3,40}$`)
